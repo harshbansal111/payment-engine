@@ -1,16 +1,29 @@
-# Payment Engine — Idempotent Transaction Processor
+# Payment Engine
 
-A production-grade idempotent transaction processing engine built with Node.js + PostgreSQL.
+A production-grade idempotent transaction processing engine built 
+with Node.js and PostgreSQL. Designed to solve real-world payment 
+problems like duplicate charges, race conditions, and worker crashes.
 
----
+## Core Guarantees
+- **Exactly-once execution** — same request retried 100 times 
+  processes exactly once. Proven under concurrent load.
+- **Race condition safe** — 20 simultaneous requests for the same 
+  payment result in attempt_count = 1 in the database.
+- **Crash recovery** — stuck transactions auto-recovered within 10 
+  seconds using a background recovery job.
+- **Tamper detection** — same idempotency key with different amount 
+  is detected and rejected immediately.
 
-## What This System Guarantees
+## How It Works
+Every payment request carries a client-generated idempotency key. 
+The engine uses PostgreSQL's INSERT ON CONFLICT as a single atomic 
+operation to resolve race conditions at the database level — no 
+application-level locking needed. A strict state machine 
+(INIT → PROCESSING → SUCCESS/FAILED) is enforced at both the 
+application and database layer using CHECK constraints.
 
-- **Exactly-once execution** — same request never processed twice
-- **Race condition safety** — DB UNIQUE constraint, not application locks
-- **Payload fingerprinting** — same key + different payload = rejected
-- **Stuck transaction recovery** — background job cleans up crashed workers
-- **Full audit trail** — every state transition recorded
+## Tech Stack
+Node.js · Express · PostgreSQL · node-postgres
 
 ---
 
