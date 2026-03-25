@@ -1,6 +1,6 @@
 # Payment Engine
 
-A production-grade idempotent transaction processing engine built 
+A idempotent transaction processing engine built 
 with Node.js and PostgreSQL. Designed to solve real-world payment 
 problems like duplicate charges, race conditions, and worker crashes.
 
